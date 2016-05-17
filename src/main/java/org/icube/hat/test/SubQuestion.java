@@ -8,7 +8,7 @@ public class SubQuestion {
 	private int questionId;
 	private String text;
 	private List<Option> optionList;
-	
+
 	public int getSubQuestionId() {
 		return subQuestionId;
 	}

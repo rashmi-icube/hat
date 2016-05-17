@@ -78,10 +78,12 @@ public class SummaryHelper {
 	 * @param status - accepted / rejected
 	 * @param pageNumber - for pagination
 	 * @param pageSize - for pagination
+	 * @param sortBy - sort by date / score
+	 * @param orderBy - asc or desc order
 	 * @return testInfo list
 	 */
 	public List<TestInfo> searchForTestDetails(int companyId, int userId, String candidateName, Date fromDate, Date toDate, TestStatus status,
-			int pageNumber, int pageSize) {
+			int pageNumber, int pageSize, SortBy sortBy, OrderBy orderBy) {
 		List<TestInfo> testInfoList = new ArrayList<>();
 		DatabaseConnectionHelper dch = DatabaseConnectionHelper.getInstance();
 		try {
@@ -92,6 +94,10 @@ public class SummaryHelper {
 			cstmt.setDate("from_date", UtilHelper.convertJavaDateToSqlDate(fromDate));
 			cstmt.setDate("to_date", UtilHelper.convertJavaDateToSqlDate(toDate));
 			cstmt.setString("test_status", status.getValue());
+			cstmt.setString("sort_by", sortBy.getValue());
+			cstmt.setString("order_by", orderBy.getValue());
+			cstmt.setInt("page_no", pageNumber);
+
 			ResultSet rs = cstmt.executeQuery();
 			List<TestInfo> result = new ArrayList<>();
 

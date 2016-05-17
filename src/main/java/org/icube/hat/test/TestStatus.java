@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum TestStatus {
 
-	ACCEPTED("Accepted"), REJECTED("Rejected");
+	COMPLETED("Completed"), EXITED("Exited");
 
 	// Reverse-lookup map for getting a frequency from frequency ID
 	private static final Map<String, TestStatus> lookup = new HashMap<String, TestStatus>();

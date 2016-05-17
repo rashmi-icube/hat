@@ -23,7 +23,6 @@ public class DatabaseConnectionHelper {
 	public Connection masterCon;
 	public Map<Integer, Connection> companySqlConnectionPool;
 	public Map<Integer, String> companyImagePath;
-	public Map<Integer, String> companySlackUrl;
 
 	private final static String MASTER_URL = UtilHelper.getConfigProperty("master_sql_url");
 	private final static String MASTER_USER = UtilHelper.getConfigProperty("master_sql_user");
@@ -44,7 +43,6 @@ public class DatabaseConnectionHelper {
 		}
 		companySqlConnectionPool = new HashMap<>();
 		companyImagePath = new HashMap<>();
-		companySlackUrl = new HashMap<>();
 	}
 
 	@Override
@@ -94,7 +92,6 @@ public class DatabaseConnectionHelper {
 					sqlUserName = rs.getString("sql_user_id");
 					sqlPassword = rs.getString("sql_password");
 					companyImagePath.put(companyId, rs.getString("images_path"));
-					companySlackUrl.put(companyId, rs.getString("slack_url"));
 				}
 			}
 
