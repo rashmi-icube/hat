@@ -44,7 +44,7 @@ public class LabelHelper {
 		DatabaseConnectionHelper dch = DatabaseConnectionHelper.getInstance();
 		try {
 			dch.getCompanyConnection(companyId);
-			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getPreviousNextLabelMap(?)}");
+			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getPreviousNextLabels(?)}");
 			cstmt.setInt("lang_id", languageId);
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {

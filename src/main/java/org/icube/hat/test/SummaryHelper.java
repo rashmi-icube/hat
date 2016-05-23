@@ -28,7 +28,7 @@ public class SummaryHelper {
 		try {
 			dch.getCompanyConnection(companyId);
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getTestCountList(?)}");
-			cstmt.setInt("user_id", userId);
+			cstmt.setInt("userid", userId);
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
 				TestCount tc = new TestCount();
@@ -88,15 +88,17 @@ public class SummaryHelper {
 		DatabaseConnectionHelper dch = DatabaseConnectionHelper.getInstance();
 		try {
 			dch.getCompanyConnection(companyId);
+			// TODO test for null values passed
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call searchForTestDetails(?,?,?,?,?)}");
-			cstmt.setInt("user_id", userId);
+			cstmt.setInt("userid", userId);
 			cstmt.setString("candidate_name", candidateName);
 			cstmt.setDate("from_date", UtilHelper.convertJavaDateToSqlDate(fromDate));
 			cstmt.setDate("to_date", UtilHelper.convertJavaDateToSqlDate(toDate));
-			cstmt.setString("test_status", status.getValue());
-			cstmt.setString("sort_by", sortBy.getValue());
-			cstmt.setString("order_by", orderBy.getValue());
+			cstmt.setString("teststatus", status.getValue());
+			cstmt.setString("order_by_column", sortBy.getValue());
+			cstmt.setString("direction", orderBy.getValue());
 			cstmt.setInt("page_no", pageNumber);
+			cstmt.setInt("page_size", pageSize);
 
 			ResultSet rs = cstmt.executeQuery();
 			List<TestInfo> result = new ArrayList<>();
@@ -111,10 +113,8 @@ public class SummaryHelper {
 				ti.setCandidateLastName(rs.getString("last_name"));
 				ti.setCandidateStream(rs.getString("stream"));
 				ti.setCandidateMobile(rs.getString("mobile_no"));
-				ti.setCandidateAadhar(rs.getString("aadhar_no"));
 				ti.setCandidateDegree(rs.getString("degree"));
 				ti.setCandidateEmail(rs.getString("email_id"));
-				ti.setCityId(rs.getInt("city_id"));
 				ti.setScore(rs.getInt("test_score"));
 				result.add(ti);
 			}
@@ -127,12 +127,6 @@ public class SummaryHelper {
 						return obj2.getTestDate().compareTo(obj1.getTestDate());
 					}
 				});
-
-				// return a sublist of result based on the page number
-				int fromIndex = pageNumber == 1 ? 0 : (pageNumber - 1) * pageSize + 1;
-				int toIndex = pageNumber == 1 ? pageSize : pageNumber * pageSize;
-
-				testInfoList = new ArrayList<TestInfo>(result.subList(fromIndex, toIndex > result.size() ? result.size() : toIndex));
 
 			}
 
@@ -163,14 +157,14 @@ public class SummaryHelper {
 		try {
 			dch.getCompanyConnection(companyId);
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getTotalTestDetailsCount(?,?,?,?,?)}");
-			cstmt.setInt("user_id", userId);
+			cstmt.setInt("userid", userId);
 			cstmt.setString("candidate_name", candidateName);
 			cstmt.setDate("from_date", UtilHelper.convertJavaDateToSqlDate(fromDate));
 			cstmt.setDate("to_date", UtilHelper.convertJavaDateToSqlDate(toDate));
-			cstmt.setString("test_status", status.getValue());
+			cstmt.setString("teststatus", status.getValue());
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
-				testResultCount = rs.getInt("count");
+				testResultCount = rs.getInt("test_result_count");
 			}
 
 			float fPages = testResultCount / Float.valueOf(pageSize);

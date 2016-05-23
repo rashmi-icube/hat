@@ -23,7 +23,7 @@ public class UserHelper {
 		try {
 			dch.getCompanyConnection(companyId);
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getSubAdminList(?)}");
-			cstmt.setInt("user_id", userId);
+			cstmt.setInt("userid", userId);
 			ResultSet rs = cstmt.executeQuery();
 
 			while (rs.next()) {

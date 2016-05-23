@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum SortBy {
 
-	DATE("Date"), SCORE("Score");
+	DATE("test_date"), SCORE("test_score");
 
 	// Reverse-lookup map for getting a frequency from frequency ID
 	private static final Map<String, SortBy> lookup = new HashMap<String, SortBy>();

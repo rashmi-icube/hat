@@ -3,12 +3,15 @@ package org.icube.hat.test;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.icube.hat.database.DatabaseConnectionHelper;
+import org.icube.hat.helper.UtilHelper;
 
 public class TestHelper {
 
@@ -72,7 +75,7 @@ public class TestHelper {
 			cstmt.setInt("lang_id", languageId);
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
-				userAgreement = rs.getString("user_agreement");
+				userAgreement = rs.getString("value");
 			}
 			if (userAgreement.isEmpty()) {
 				throw new NullPointerException("User agreement is empty for company ID : " + companyId + " and language ID : " + languageId);
@@ -117,6 +120,7 @@ public class TestHelper {
 			cstmt.setString("degreeip", degree);
 			cstmt.setString("streamip", stream);
 			cstmt.setInt("userid", userId);
+			cstmt.setTimestamp("testDate", UtilHelper.convertJavaDateToSqlTimestamp(Date.from(Instant.now())));
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
 				ti.setTestId(rs.getInt("test_id"));
@@ -149,8 +153,8 @@ public class TestHelper {
 			while (rs.next()) {
 				keyValuePairMap.put(rs.getString("key"), rs.getString("value"));
 			}
-			testInstruction = String.format(keyValuePairMap.get("instructions"), testId, keyValuePairMap.get("total_questions"), keyValuePairMap
-					.get("total_time"));
+			testInstruction = String.format(keyValuePairMap.get("test_direction"), testId, keyValuePairMap.get("total_questions"), keyValuePairMap
+					.get("total_test_time"));
 		} catch (SQLException e) {
 			org.apache.log4j.Logger.getLogger(TestHelper.class).error("Exception while retrieving the test instructions for test ID : " + testId, e);
 		}
@@ -170,7 +174,7 @@ public class TestHelper {
 		try {
 			dch.getCompanyConnection(companyId);
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getQuestionList(?)}");
-			cstmt.setInt("test_id", testId);
+			cstmt.setInt("testid", testId);
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
 				qIdList.add(rs.getInt("ques_id"));
@@ -195,7 +199,7 @@ public class TestHelper {
 		try {
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("call getQuestionDetails(?,?)");
 			cstmt.setInt("lang_id", languageId);
-			cstmt.setInt("ques_id", questionId);
+			cstmt.setInt("quesid", questionId);
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
 				q.setQuestionId(questionId);
@@ -224,7 +228,7 @@ public class TestHelper {
 			dch.getCompanyConnection(companyId);
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getSubQuestionList(?,?)}");
 			cstmt.setInt("lang_id", languageId);
-			cstmt.setInt("ques_id", questionId);
+			cstmt.setInt("quesid", questionId);
 			ResultSet rs = cstmt.executeQuery();
 			Map<Integer, List<Option>> subQuestionOptionListMap = getSubQuestionOptionListMap(companyId, languageId, questionId);
 			while (rs.next()) {
@@ -257,11 +261,11 @@ public class TestHelper {
 			dch.getCompanyConnection(companyId);
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call getOptionList(?,?)}");
 			cstmt.setInt("lang_id", languageId);
-			cstmt.setInt("ques_id", questionId);
+			cstmt.setInt("quesid", questionId);
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
 				Option o = new Option();
-				o.setOptionId(rs.getInt("opt_id"));
+				o.setOptionId(rs.getInt("option_id"));
 				o.setQuestionId(rs.getInt("ques_id"));
 				int subQuestionId = rs.getInt("sub_ques_id");
 				o.setSubQuestionId(subQuestionId);
@@ -296,7 +300,7 @@ public class TestHelper {
 		try {
 			dch.getCompanyConnection(companyId);
 			CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call updateTestStatus(?,?)}");
-			cstmt.setInt("test_id", testId);
+			cstmt.setInt("testid", testId);
 			cstmt.setString("status", status.getValue());
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
@@ -305,7 +309,7 @@ public class TestHelper {
 
 			if (statusUpdated) {
 				CallableStatement cstmt1 = dch.companySqlConnectionPool.get(companyId).prepareCall("{call updateResult(?)}");
-				cstmt1.setInt("test_id", testId);
+				cstmt1.setInt("testid", testId);
 				ResultSet rs1 = cstmt.executeQuery();
 				while (rs.next()) {
 					resultUpdated = rs1.getBoolean("result_updated");
@@ -334,10 +338,10 @@ public class TestHelper {
 				if (r.getOptionId() > 0) {
 					subQuestionId = r.getSubQuestionId();
 					CallableStatement cstmt = dch.companySqlConnectionPool.get(companyId).prepareCall("{call saveResponse(?,?,?,?)}");
-					cstmt.setInt("test_id", r.getTestId());
-					cstmt.setInt("ques_id", r.getQuestionId());
-					cstmt.setInt("sub_ques_id", r.getSubQuestionId());
-					cstmt.setInt("opt_id", r.getOptionId());
+					cstmt.setInt("testid", r.getTestId());
+					cstmt.setInt("quesid", r.getQuestionId());
+					cstmt.setInt("subquesid", r.getSubQuestionId());
+					cstmt.setInt("optionid", r.getOptionId());
 					ResultSet rs = cstmt.executeQuery();
 					while (rs.next()) {
 						responseSaved = rs.getBoolean("response_saved");
@@ -367,7 +371,7 @@ public class TestHelper {
 			cstmt.setInt("lang_id", languageId);
 			ResultSet rs = cstmt.executeQuery();
 			while (rs.next()) {
-				thankYouText = rs.getString("thank_you_text");
+				thankYouText = rs.getString("value");
 			}
 			if (thankYouText.isEmpty()) {
 				throw new NullPointerException("Thank you is empty for company ID : " + companyId + " and language ID : " + languageId);

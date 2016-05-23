@@ -38,7 +38,7 @@ public class Login {
 				companySqlCon = dch.companySqlConnectionPool.get(companyId);
 			}
 			CallableStatement cstmt1 = companySqlCon.prepareCall("{call verifyLogin(?,?,?,?)}");
-			cstmt1.setString("loginid", emailId);
+			cstmt1.setString("emailid", emailId);
 			cstmt1.setString("pass", password);
 			cstmt1.setTimestamp("curr_time", UtilHelper.convertJavaDateToSqlTimestamp(Date.from(Instant.now())));
 			cstmt1.setString("ip", ipAddress);

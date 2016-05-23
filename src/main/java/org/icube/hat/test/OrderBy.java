@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum OrderBy {
 
-	ASCENDING("Ascending"), DESCENDING("Descending");
+	ASCENDING("asc"), DESCENDING("desc");
 
 	// Reverse-lookup map for getting a frequency from frequency ID
 	private static final Map<String, OrderBy> lookup = new HashMap<String, OrderBy>();

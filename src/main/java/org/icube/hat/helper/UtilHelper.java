@@ -24,6 +24,9 @@ public class UtilHelper {
 	}
 
 	public static java.sql.Date convertJavaDateToSqlDate(java.util.Date date) {
+		if (date == null) {
+			return null;
+		}
 		return new java.sql.Date(date.getTime());
 	}
 
